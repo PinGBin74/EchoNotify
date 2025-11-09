@@ -58,7 +58,7 @@ jobs:
         run: uv run pytest
 
   notify:
-    needs: [lint, test, docker]
+    needs: [lint, test]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -67,7 +67,6 @@ jobs:
         run: |
           if [ "${{ needs.lint.result }}" = "success" ] && \
              [ "${{ needs.test.result }}" = "success" ] && \
-             [ "${{ needs.docker.result }}" = "success" ]; then
             echo "msg=✅ CI успешно завершён" >> $GITHUB_OUTPUT
           else
             echo "msg=❌ CI провалился" >> $GITHUB_OUTPUT
