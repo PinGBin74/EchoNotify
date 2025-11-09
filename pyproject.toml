@@ -12,3 +12,53 @@ dependencies = [
     "uvicorn>=0.38.0",
     "websockets>=15.0.1",
 ]
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8.3.5,<9.0.0"
+pytest-asyncio = ">=0.26.0,<0.27.0"
+pytest-cov = ">=5.0.0,<6.0.0"
+faker = ">=37.1.0,<38.0.0"
+pytest-factoryboy = ">=2.7.0,<3.0.0"
+httpx = ">=0.28.1,<0.29.0"
+requests = ">=2.32.3,<3.0.0"
+black = "^24.8.0"
+ruff = "^0.6.8"
+isort = "^6.0.0"
+testcontainers = ">=4.9.0,<5.0.0"
+
+[tool.black]
+line-length = 79
+target-version = ['py312']
+exclude = '''
+/(
+    \.venv
+  | \.git
+  | \.idea
+  | migrations
+  | alembic
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 79
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+skip = [".venv", "migrations", "alembic"]
+
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+exclude = [".venv", "migrations", "alembic"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "C"]
+ignore = ["E501", "B008"]
+
+[pytest]
+asyncio_mode = "auto"
