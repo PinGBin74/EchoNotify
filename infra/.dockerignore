@@ -1,0 +1,13 @@
+infra/
+alembic/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.git/
+.gitignore
+.dockerignore 
+.env
