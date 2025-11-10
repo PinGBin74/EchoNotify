@@ -8,10 +8,14 @@ dependencies = [
     "aiokafka>=0.12.0",
     "celery>=5.5.3",
     "fastapi>=0.121.1",
+    "gunicorn>=23.0.0",
     "redis>=7.0.1",
+    "sqlalchemy>=2.0.44",
     "uvicorn>=0.38.0",
     "websockets>=15.0.1",
 ]
+[tool.poetry]
+packages = [{ include = "echonotify" }]
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
@@ -31,7 +35,7 @@ testcontainers = ">=4.9.0,<5.0.0"
 
 [tool.black]
 line-length = 79
-target-version = ['py312']
+target-version = ['py313']
 exclude = '''
 /(
     \.venv
@@ -53,7 +57,7 @@ skip = [".venv", "migrations", "alembic"]
 
 [tool.ruff]
 line-length = 79
-target-version = "py312"
+target-version = "py313"
 exclude = [".venv", "migrations", "alembic"]
 
 [tool.ruff.lint]
