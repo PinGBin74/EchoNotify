@@ -1,6 +1,6 @@
 import json
 import os
-from typing import List
+from typing import List, Optional
 
 from pydantic_settings import BaseSettings
 
@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     DB_NAME: str = ""
     DATABASE_URL: str = ""
     CORS_ORIGINS: str = ""
-    CORS_MAX_AGE: int = ""
+    CORS_MAX_AGE: Optional[int] = None
 
     # JWT settings
     JWT_SECRET_KEY: str = ""
