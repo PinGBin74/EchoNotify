@@ -10,7 +10,7 @@ from alembic import context
 from echonotify.infrastructure.database.models import Base
 from echonotify.settings import Settings
 
-from echonotify.user.models import UserProfile, RefreshToken
+from echonotify.user.user_profile.models import UserProfile, RefreshToken
 
 config = context.config
 
