@@ -9,30 +9,23 @@ from echonotify.user.user_profile.models import UserProfile
 
 @dataclass
 class UserRepository:
-    db_session: AsyncSession
+    session: AsyncSession
 
-    async def create_user(
-        self, session: AsyncSession, user_data: UserCreateSchema
-    ) -> UserProfile:
+    async def create_user(self, user_data: UserCreateSchema) -> UserProfile:
         user = UserProfile(
             name=user_data.name,
             email=user_data.email,
             password=user_data.password,
         )
-        session.add(user)
-        await session.commit()
-        await session.refresh(user)
+        self.session.add(user)
+        await self.session.commit()
+        await self.session.refresh(user)
         return user
 
-    async def get_user_by_email(
-        self, session: AsyncSession, email: str
-    ) -> UserProfile:
-        user_query = select(UserProfile).where(UserProfile.email == email)
-        result = await session.execute(user_query)
-        return result.scalar_one_or_none()
+    async def get_user_by_email(self, email: str) -> UserProfile | None:
+        stmt = select(UserProfile).where(UserProfile.email == email)
+        return (await self.session.execute(stmt)).scalar_one_or_none()
 
-    async def get_user_by_id(self, session: AsyncSession, user_id: int):
-        user_query = select(UserProfile).where(UserProfile.id == user_id)
-        result = await session.execute(user_query)
-        user = result.scalar_one_or_none()
-        return user
+    async def get_user_by_id(self, user_id: int) -> UserProfile | None:
+        stmt = select(UserProfile).where(UserProfile.id == user_id)
+        return (await self.session.execute(stmt)).scalar_one_or_none()
