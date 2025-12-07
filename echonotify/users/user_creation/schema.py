@@ -10,7 +10,3 @@ class UserCreateSchema(BaseModel):
 
     class Config:
         from_attributes = True
-
-
-class VerifyCodeSchema(BaseModel):
-    code: str
