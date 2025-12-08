@@ -39,9 +39,7 @@ class UserRepository:
 
     async def user_exists(self, email: str) -> bool:
         """Check if a user with the given email exists."""
-        user = await self.get_user_data_by_email(
-            email, self.session, UserProfile
-        )
+        user = await self.get_user_data_by_email(email)
         return user is not None
 
     async def get_user_data_by_email(self, email: str):

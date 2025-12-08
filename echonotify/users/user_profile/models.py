@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from echonotify.infrastructure.database.models import Base
 
@@ -14,17 +14,6 @@ class UserProfile(Base):
     name: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True, index=True)
     password: Mapped[str] = mapped_column(nullable=False)
-    google_sub: Mapped[str] = mapped_column(nullable=True, unique=True)
-    is_google_account: Mapped[bool] = mapped_column(
-        default=False, nullable=False
-    )
-    vk_sub: Mapped[str] = mapped_column(nullable=True, unique=True)
-    is_vk_account: Mapped[bool] = mapped_column(default=False, nullable=True)
-
-    statistics = relationship(
-        "UserStatistics", back_populates="user", uselist=False
-    )
-    stars = relationship("UserStars", back_populates="user", uselist=False)
 
 
 class RefreshToken(Base):
