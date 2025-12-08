@@ -17,9 +17,9 @@ greenlet = ">=3.2.4"
 gunicorn = ">=23.0.0"
 jose = ">=1.0.0"
 jwt = ">=1.4.0"
-passlib = ">=1.7.4"
 pydantic-settings = ">=2.11.0"
 python-jose = { version = ">=3.5.0", extras = ["cryptography"] }
+passlib = { version = ">=1.7.4", extras = ["argon2"] }
 redis = ">=7.0.1"
 sqlalchemy = ">=2.0.44"
 uvicorn = ">=0.38.0"
