@@ -1,6 +1,6 @@
 services:
-  db:
-    image: postgres:latest
+  postgres:
+    image: postgres:16-alpine  # Используем alpine для скорости и 16 версию
     restart: always
     shm_size: 128mb
     ports:
@@ -12,14 +12,15 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - db-data_echonotify:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data  # Для 16 версии работает старый путь
+
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
+      test: [ "CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}" ]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  app:
+  echonotify:
     build:
       context: ..
       dockerfile: infra/Dockerfile
@@ -30,8 +31,9 @@ services:
     environment:
       - ENVIRONMENT=docker
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
+    restart: always
 
 volumes:
-  db-data:
+  postgres_data:
