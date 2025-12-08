@@ -3,14 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
+from echonotify.auth.handlers import router as auth_router
 from echonotify.settings import Settings
+from echonotify.users.user_creation.handlers import router as users_router
 
 settings = Settings()
 
 
 app = FastAPI(
-    title="Omsklingo API",
-    description="API for Omsklingo",
+    title="Echonotify API",
+    description="API for Echonotify",
     version="0.1.0",
 )
 
@@ -37,3 +39,8 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return RedirectResponse(url="/docs")
+
+
+app.include_router(auth_router)
+
+app.include_router(users_router)

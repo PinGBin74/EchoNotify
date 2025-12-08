@@ -1,26 +1,58 @@
-from abc import ABC, abstractmethod
-from typing import List
+from typing import Optional, Protocol
 
-from echonotify.users.user_profile.models import RefreshToken
+from pydantic import EmailStr
+
+from echonotify.users.user_profile.models import RefreshToken, UserProfile
 
 
-class IRefreshTokenRepository(ABC):
-    @abstractmethod
-    async def find_valid_tokens(self, user_id: int) -> List[RefreshToken]:
-        pass
+class IRefreshTokenRepository(Protocol):
+    """
+    Interface for work with refresh_tokens
+    """
 
-    @abstractmethod
-    async def find_all_valid(self) -> List[RefreshToken]:
-        pass
+    async def find_all_valid(self) -> list[RefreshToken]:
+        """
+        Return list of all working refresh_tokens.
+        """
+        ...
 
-    @abstractmethod
     async def save(self, token: RefreshToken) -> None:
-        pass
+        """
+        Save new refresh_token.
+        """
+        ...
 
-    @abstractmethod
     async def delete(self, token: RefreshToken) -> None:
-        pass
+        """
+        Delete certain refresh_token.
+        """
+        ...
 
-    @abstractmethod
     async def delete_all_for_user(self, user_id: int) -> None:
-        pass
+        """
+        Delete all refresh_tokens.
+        """
+        ...
+
+
+class IUserRepository(Protocol):
+    """
+    Interface for work with users
+    Using Orm.
+    """
+
+    async def get_user_data_by_email(
+        self, email: EmailStr, session, model: type[UserProfile]
+    ) -> Optional[UserProfile]:
+        """
+        Return users by email or None.
+        """
+        ...
+
+    async def get_user_by_id(
+        self, user_id: int, session
+    ) -> Optional[UserProfile]:
+        """
+        Search users by id.
+        """
+        ...
