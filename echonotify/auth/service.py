@@ -9,10 +9,6 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import EmailStr
 
-from echonotify.auth.constants import (
-    EXPIRES_AT_ACCESS_TOKEN,
-    EXPIRES_AT_REFRESH_TOKEN,
-)
 from echonotify.auth.interfaces import IRefreshTokenRepository, IUserRepository
 from echonotify.auth.schema import UserLoginSchema
 from echonotify.auth.utils import utc_now_naive
@@ -59,7 +55,11 @@ class JWTService:
                 + timedelta(minutes=self.access_exp_minutes)
             ).timestamp(),
         }
-        return jwt.encode(payload, self.secret, algorithm=self.algorithm)
+        return jwt.encode(
+            payload,
+            settings.JWT_SECRET_KEY,
+            algorithm=settings.JWT_ENCODE_ALGORITHM,
+        )
 
 
 class RefreshTokenService:
@@ -191,42 +191,6 @@ class AuthServicesBundle:
     validator: AuthValidator
     auth_service: AuthService
 
-    def build_auth_services(
-        self,
-        user_repo: IUserRepository,
-        refresh_repo: IRefreshTokenRepository,
-        *,
-        settings_obj: Settings = settings,
-    ) -> AuthServicesBundle:
-        pwd = PasswordService()
-        jwt_svc = JWTService(
-            secret=settings_obj.JWT_SECRET_KEY,
-            algorithm=settings_obj.JWT_ENCODE_ALGORITHM,
-            access_exp_minutes=EXPIRES_AT_ACCESS_TOKEN,
-        )
-        refresh_svc = RefreshTokenService(
-            repo=refresh_repo,
-            password_service=pwd,
-            refresh_expires_seconds=EXPIRES_AT_REFRESH_TOKEN,
-        )
-        user_svc = UserService(user_repo)
-        validator = AuthValidator(pwd)
-        auth = AuthService(
-            user_service=user_svc,
-            jwt_service=jwt_svc,
-            refresh_service=refresh_svc,
-            validator=validator,
-        )
-
-        return AuthServicesBundle(
-            password_service=pwd,
-            jwt_service=jwt_svc,
-            refresh_service=refresh_svc,
-            user_service=user_svc,
-            validator=validator,
-            auth_service=auth,
-        )
-
     def get_email_from_access_token(self, access_token: str) -> str:
         """Extract user ID from JWT access token."""
         payload = self.get_payload_from_access_token(access_token)
@@ -239,7 +203,8 @@ class AuthServicesBundle:
         user_id = payload["user_id"]
         return user_id
 
-    def get_payload_from_access_token(self, access_token: str) -> dict:
+    @staticmethod
+    def get_payload_from_access_token(access_token: str) -> dict:
         """Extract payload fron access token."""
         try:
             payload = jwt.decode(

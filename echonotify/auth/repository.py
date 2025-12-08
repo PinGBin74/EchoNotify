@@ -1,4 +1,3 @@
-# repository.py
 from typing import List
 
 from sqlalchemy import delete, select
