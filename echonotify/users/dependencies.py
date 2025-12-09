@@ -25,6 +25,7 @@ logging = logging.getLogger(__name__)
 settings = Settings()
 
 
+@handle_token_errors
 async def get_auth_service(
     session: AsyncSession = Depends(get_db_session),
 ) -> AuthServicesBundle:

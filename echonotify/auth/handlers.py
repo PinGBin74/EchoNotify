@@ -8,10 +8,9 @@ from echonotify.auth.schema import (
     UserLoginRequestSchema,
     UserLoginResponseSchema,
 )
-from echonotify.auth.service import (  # Added import for AuthServicesBundle
+from echonotify.auth.service import (
     AuthServicesBundle,
 )
-from echonotify.config import logging
 from echonotify.exception import (
     TokenExpiredError,
     TokenNotCorrectError,
@@ -26,7 +25,6 @@ from echonotify.users.dependencies import (
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 settings = Settings()
-logger = logging.getLogger(__name__)
 
 
 @router.post("/login", response_model=UserLoginResponseSchema)
