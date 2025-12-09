@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from echonotify.auth.constants import (
@@ -83,18 +82,6 @@ class UserService:
     async def get_user_by_id(self, user_id: int):
         """Retrieve a user by their ID."""
         return await self.user_repo.get_user_by_id(user_id)
-
-    async def update_user_password(
-        self, email: str, new_password: str
-    ) -> None:
-        """Update a user's password."""
-        hashed_password = self.auth_service.validator.password_service.hash(
-            new_password
-        )
-        try:
-            await self.user_repo.update_user_password(email, hashed_password)
-        except ValueError as e:
-            raise HTTPException(status_code=404, detail=str(e)) from e
 
 
 class CreateUser(UserService):
