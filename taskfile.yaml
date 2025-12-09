@@ -1,0 +1,20 @@
+version: '3'
+
+tasks:
+  setup:
+    desc: "Настройка проекта"
+    cmds:
+      - echo "TODO: Настроить окружение"
+      - echo "TODO: Установить зависимости"
+
+  test:
+    desc: "Запуск тестов"
+    cmds:
+      - echo "TODO: Написать тесты"
+      - echo "TODO: Настроить pytest"
+
+  deploy:
+    desc: "Деплой приложения"
+    cmds:
+      - echo "TODO: Настроить Docker"
+      - echo "TODO: Настроить CI/CD"
