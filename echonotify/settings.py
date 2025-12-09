@@ -19,10 +19,14 @@ class Settings(BaseSettings):
 
     # JWT settings
     JWT_SECRET_KEY: str = ""
-    JWT_ENCODE_ALGORITHM: str = ""
+    JWT_ENCODE_ALGORITHM: str = "HS256"
 
     # PyOTP settings
     PYOTP_SECRET_KEY: str = ""
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
     @property
     def cors_origins_list(self) -> List[str]:
@@ -45,7 +49,7 @@ class Settings(BaseSettings):
     def db_url(self) -> str:
         env = os.getenv("ENVIRONMENT", "local")
         if env == "docker":
-            host = "db"
+            host = "postgres"
         else:
             host = self.DB_HOST or "localhost"
         return (

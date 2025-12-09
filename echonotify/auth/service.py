@@ -41,9 +41,9 @@ class PasswordService:
 class JWTService:
     """Generate access-jwt"""
 
-    def __init__(self, secret: str, algorithm: str, access_exp_minutes: int):
-        self.secret = secret
-        self.algorithm = algorithm
+    def __init__(self, access_exp_minutes: int):
+        self.secret = settings.JWT_SECRET_KEY
+        self.algorithm = settings.JWT_ENCODE_ALGORITHM
         self.access_exp_minutes = access_exp_minutes
 
     def generate_access(self, user_id: int, email: EmailStr) -> str:
@@ -57,8 +57,8 @@ class JWTService:
         }
         return jwt.encode(
             payload,
-            settings.JWT_SECRET_KEY,
-            algorithm=settings.JWT_ENCODE_ALGORITHM,
+            self.secret,
+            algorithm=self.algorithm,
         )
 
 
@@ -112,13 +112,13 @@ class UserService:
         self.user_repo = user_repo
 
     async def get_by_email(self, email: EmailStr, session) -> UserProfile:
-        user = await self.user_repo.get_by_email(email, session)
+        user = await self.user_repo.get_user_data_by_email(email)
         if not user:
             raise UserNotFoundError("User not found")
         return user
 
     async def get_by_id(self, user_id: int, session) -> UserProfile:
-        user = await self.user_repo.get_by_id(user_id, session)
+        user = await self.user_repo.get_user_by_id(user_id)
         if not user:
             raise UserNotFoundError("User not found")
         return user
@@ -129,8 +129,6 @@ class AuthValidator:
         self.password_service = password_service
 
     def validate_login(self, user: UserProfile, password: str) -> None:
-        if user.is_google_account:
-            raise UserNotCorrectPasswordError("Google auth required")
         if not self.password_service.verify(password, user.password):
             raise UserNotCorrectPasswordError("Wrong password")
 

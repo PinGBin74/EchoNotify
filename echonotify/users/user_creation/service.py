@@ -33,9 +33,7 @@ class UserService:
 
         password_service = PasswordService()
         jwt_service = JWTService(
-            secret=self.settings.JWT_SECRET_KEY,
-            algorithm=self.settings.JWT_ENCODE_ALGORITHM,
-            access_exp_minutes=EXPIRES_AT_ACCESS_TOKEN,
+            EXPIRES_AT_ACCESS_TOKEN,
         )
         refresh_service = RefreshTokenService(
             repo=refresh_repo,

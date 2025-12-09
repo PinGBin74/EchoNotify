@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
+from echonotify.auth.constants import EXPIRES_AT_REFRESH_TOKEN
 from echonotify.auth.cookies import CookieManager
 from echonotify.auth.schema import (
     UserLoginRequestSchema,
@@ -19,7 +21,6 @@ from echonotify.infrastructure.database.database import get_db_session
 from echonotify.settings import Settings
 from echonotify.users.dependencies import (
     get_auth_service,
-    get_current_user_id,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -28,32 +29,26 @@ settings = Settings()
 logger = logging.getLogger(__name__)
 
 
-# ------------------------------
-# LOGIN
-# ------------------------------
 @router.post("/login", response_model=UserLoginResponseSchema)
 async def login(
     body: UserLoginRequestSchema,
     response: Response,
     session: AsyncSession = Depends(get_db_session),
-    auth_bundle: AuthServicesBundle = Depends(
-        get_auth_service
-    ),  # Fixed: Added type hint AuthServicesBundle
+    auth_bundle: AuthServicesBundle = Depends(get_auth_service),
 ):
     """
     Login user, return access token and set refresh_token cookie.
     """
 
-    auth_service = auth_bundle.auth_service  # <--- главное отличие
+    auth_service = auth_bundle.auth_service
 
     try:
-        # login(email, password, session)
         result = await auth_service.login(body.email, body.password, session)
 
         # set refresh token cookie
         CookieManager(response).set_refresh_token(
             result.refresh_token,
-            settings.REFRESH_TOKEN_EXPIRE_SECONDS,
+            EXPIRES_AT_REFRESH_TOKEN,
         )
 
         return UserLoginResponseSchema(
@@ -62,20 +57,17 @@ async def login(
         )
 
     except UserNotCorrectPasswordError as e:
-        raise HTTPException(status_code=403, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
+        ) from e
 
 
-# ------------------------------
-# REFRESH ACCESS TOKEN
-# ------------------------------
 @router.post("/refresh", response_model=dict)
 async def refresh(
     response: Response,
     raw_refresh: str = Cookie(alias="refresh_token"),
     session: AsyncSession = Depends(get_db_session),
-    auth_bundle: AuthServicesBundle = Depends(
-        get_auth_service
-    ),  # Fixed: Added type hint AuthServicesBundle
+    auth_bundle: AuthServicesBundle = Depends(get_auth_service),
 ):
     """
     Refresh access token by refresh cookie.
@@ -91,7 +83,7 @@ async def refresh(
 
         CookieManager(response).set_refresh_token(
             tokens.refresh_token,
-            settings.REFRESH_TOKEN_EXPIRE_SECONDS,
+            EXPIRES_AT_REFRESH_TOKEN,
         )
 
         return {
@@ -100,30 +92,6 @@ async def refresh(
         }
 
     except (TokenNotCorrectError, TokenExpiredError) as e:
-        raise HTTPException(status_code=403, detail=str(e)) from e
-
-
-# ------------------------------
-# LOGOUT
-# ------------------------------
-@router.post("/logout")
-async def logout(
-    response: Response,
-    raw_refresh: str = Cookie(alias="refresh_token"),
-    session: AsyncSession = Depends(get_db_session),
-    user_id: int = Depends(get_current_user_id),
-    auth_bundle: AuthServicesBundle = Depends(
-        get_auth_service
-    ),  # Fixed: Added type hint AuthServicesBundle
-):
-    """
-    Logout user – invalidate refresh token and remove cookie.
-    """
-
-    auth_service = auth_bundle.auth_service
-
-    await auth_service.logout(raw_refresh)
-
-    CookieManager(response).delete_refresh_token()
-
-    return {"message": "Successfully logged out"}
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
+        ) from e

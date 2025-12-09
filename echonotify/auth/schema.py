@@ -17,9 +17,5 @@ class UserLoginResponseSchema(BaseModel):
     access_token: str
 
 
-class VkTokenRequestSchema(BaseModel):
-    access_token: str
-
-
 class Config:
     from_attributes = True

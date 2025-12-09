@@ -42,16 +42,14 @@ class IUserRepository(Protocol):
     """
 
     async def get_user_data_by_email(
-        self, email: EmailStr, session, model: type[UserProfile]
+        self, email: EmailStr
     ) -> Optional[UserProfile]:
         """
         Return users by email or None.
         """
         ...
 
-    async def get_user_by_id(
-        self, user_id: int, session
-    ) -> Optional[UserProfile]:
+    async def get_user_by_id(self, user_id: int) -> Optional[UserProfile]:
         """
         Search users by id.
         """

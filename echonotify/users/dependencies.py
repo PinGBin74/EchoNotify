@@ -14,6 +14,7 @@ from echonotify.auth.service import (
 from echonotify.config import logging
 from echonotify.settings import Settings
 
+from ..auth.constants import EXPIRES_AT_ACCESS_TOKEN, EXPIRES_AT_REFRESH_TOKEN
 from ..auth.repository import RefreshTokenRepositorySQLAlchemy
 from ..decorators import handle_token_errors
 from ..infrastructure.database.database import get_db_session
@@ -32,14 +33,12 @@ async def get_auth_service(
 
     password_service = PasswordService()
     jwt_service = JWTService(
-        secret=settings.JWT_SECRET_KEY,
-        algorithm=settings.JWT_ENCODE_ALGORITHM,
-        access_exp_minutes=settings.EXPIRES_AT_ACCESS_TOKEN,
+        access_exp_minutes=EXPIRES_AT_ACCESS_TOKEN,
     )
     refresh_service = RefreshTokenService(
         repo=refresh_repo,
         password_service=password_service,
-        refresh_expires_seconds=settings.EXPIRES_AT_REFRESH_TOKEN,
+        refresh_expires_seconds=EXPIRES_AT_REFRESH_TOKEN,
     )
     user_service = UserService(user_repo)
     validator = AuthValidator(password_service)
