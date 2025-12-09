@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master, develop, 'feature/*', 'hotfix/*', 'fix/*']
+    branches: [main, develop, 'feature/*', 'hotfix/*', 'fix/*']
   pull_request:
-    branches: [master, develop, 'feature/*', 'hotfix/*', 'fix/*']
+    branches: [main, develop, 'feature/*', 'hotfix/*', 'fix/*']
 
 jobs:
   lint:
@@ -56,28 +56,3 @@ jobs:
 
       - name: Run tests
         run: uv run pytest
-
-  notify:
-    needs: [lint, test]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Decide status
-        id: status
-        run: |
-          if [ "${{ needs.lint.result }}" = "success" ] && \
-             [ "${{ needs.test.result }}" = "success" ] && \
-            echo "msg=✅ CI успешно завершён" >> $GITHUB_OUTPUT
-          else
-            echo "msg=❌ CI провалился" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Telegram notify
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: |
-            ${{ steps.status.outputs.msg }}
-            Репо: ${{ github.repository }}
-            Лог:  https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
