@@ -16,3 +16,7 @@ class UserNotFoundError(Exception):
 
 class UserNotCorrectPasswordError(Exception):
     detail = "User not correct password Error"
+
+
+class OrderWasNotFoundError(Exception):
+    detail = "Order was not found"
