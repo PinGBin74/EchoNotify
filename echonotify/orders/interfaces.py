@@ -6,7 +6,7 @@ from echonotify.orders.schema import OrderResponse
 
 
 class IOrderRepository(Protocol):
-    """Inteface for work with orders"""
+    """Interface for work with orders"""
 
     async def get_order_by_id(self, order_id: int) -> Orders:
         """Get order by id"""
