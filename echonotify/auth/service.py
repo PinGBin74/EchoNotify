@@ -149,7 +149,11 @@ class AuthService:
     async def login(
         self, email: EmailStr, password: str, session
     ) -> UserLoginSchema:
-        user = await self.user_service.get_by_email(email, session)
+        try:
+            user = await self.user_service.get_by_email(email, session)
+        except UserNotFoundError:
+            raise UserNotFoundError() from None
+
         self.validator.validate_login(user, password)
 
         access_token = self.jwt_service.generate_access(user.id, user.email)
