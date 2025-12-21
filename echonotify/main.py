@@ -4,6 +4,7 @@ from fastapi.responses import RedirectResponse
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from echonotify.auth.handlers import router as auth_router
+from echonotify.orders.handlers import router as orders_router
 from echonotify.settings import Settings
 from echonotify.users.user_creation.handlers import router as users_router
 
@@ -44,3 +45,5 @@ async def root():
 app.include_router(auth_router)
 
 app.include_router(users_router)
+
+app.include_router(orders_router)
