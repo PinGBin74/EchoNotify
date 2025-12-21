@@ -24,7 +24,7 @@ class Orders(Base):
     created_ad: Mapped[datetime] = mapped_column(nullable=False)
     price: Mapped[float] = mapped_column(default=0.0)
 
-    orders = relationship("UsersOrder", back_populates="order", uselist=False)
+    user_orders = relationship("UsersOrder", back_populates="order")
 
 
 class UsersOrder(Base):
@@ -32,10 +32,12 @@ class UsersOrder(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("UserProfile.id"), index=True
+        ForeignKey("user_profile.id"), index=True
     )
     order_id: Mapped[int] = mapped_column(ForeignKey("Orders.id"), index=True)
-    delivery_status: Mapped[Enum] = mapped_column(default=OrderStatus.PENDING)
+    delivery_status: Mapped[OrderStatus] = mapped_column(
+        default=OrderStatus.PENDING
+    )
     created_at: Mapped[datetime] = mapped_column(default=utc_now_naive)
 
-    users_orders = relationship("Orders", back_populates="user", uselist=False)
+    order = relationship("Orders", back_populates="user_orders")

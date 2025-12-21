@@ -14,12 +14,26 @@ class IOrderRepository(Protocol):
 
     async def update_status(
         self, order_id: int, status: OrderStatus
-    ) -> Orders:
+    ) -> UsersOrder:
         """Update status by order_id"""
         ...
 
     async def delete_order(self, order_id: int) -> None:
         """Delete order by order_id"""
+        ...
+
+    async def change_status(
+        self, order_id: int, new_status: OrderStatus
+    ) -> OrderResponse:
+        """Change order status"""
+        ...
+
+    async def cancel_order(self, order_id: int) -> bool:
+        """Cancel order"""
+        ...
+
+    async def complete_delivery(self, order_id: int) -> OrderResponse:
+        """Complete delivery"""
         ...
 
 
@@ -36,29 +50,35 @@ class IUserOrderRepository(Protocol):
         """Get user's orders by user_id and order_id"""
         ...
 
+    async def get_user_orders(
+        self, user_id: int, status: OrderStatus | None = None
+    ) -> list[OrderResponse]:
+        """Get all orders by user's id with optional status filter"""
+        ...
+
 
 class IOrderService(Protocol):
     """Interface for business logic(Orders)"""
 
     async def get_user_orders(
-        self, user_id: int, status: OrderStatus = None
+        self, user_id: int, status: OrderStatus
     ) -> list[OrderResponse]:
         """Get user's orders"""
-        pass
+        ...
 
     async def change_status(
         self, order_id: int, new_status: OrderStatus
     ) -> OrderResponse:
         """Change order's status"""
-        pass
+        ...
 
     async def cancel_order(self, order_id: int) -> bool:
-        """Cancell order (only PENDING/PAID)"""
-        pass
+        """Cancel order (only PENDING/PAID)"""
+        ...
 
     async def complete_delivery(self, order_id: int) -> OrderResponse:
         """Finish delivery"""
-        pass
+        ...
 
 
 class IOrderStatistics(Protocol):
@@ -66,10 +86,10 @@ class IOrderStatistics(Protocol):
 
     async def get_user_stats(self, user_id: int) -> dict:
         """User's statistics about orders: quantity, amount, average check bill"""
-        pass
+        ...
 
     async def get_total_revenue(
         self, status: OrderStatus, date_from: datetime, date_to: datetime
     ) -> float:
         """Get total revenue"""
-        pass
+        ...
