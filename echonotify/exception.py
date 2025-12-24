@@ -16,3 +16,15 @@ class UserNotFoundError(Exception):
 
 class UserNotCorrectPasswordError(Exception):
     detail = "User not correct password Error"
+
+
+class OrderWasNotFoundError(Exception):
+    detail = "Order was not found"
+
+
+class UnavailableChangeStatusError(Exception):
+    detail = "Unavailable change status Error"
+
+
+class UnableToCancelTheOrder(Exception):
+    detail = "Unable to cancel the order"

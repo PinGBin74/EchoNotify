@@ -22,16 +22,8 @@ class CookieManager:
             max_age=expires_in,
         )
 
-    def delete_refresh_token(self) -> None:
-        """Remove the refresh token cookie."""
-        self.response.delete_cookie("refresh_token")
-
     @staticmethod
     def set_refresh_cookie(
         response: Response, refresh_token: str, expires_in: int
     ) -> None:
         CookieManager(response).set_refresh_token(refresh_token, expires_in)
-
-    @staticmethod
-    def delete_refresh_cookie(response: Response) -> None:
-        CookieManager(response).delete_refresh_token()
