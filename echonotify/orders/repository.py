@@ -3,8 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from echonotify.exception import (
     OrderWasNotFoundError,
-    UnableToCancelTheOrder,
-    UnavailableChangeStatusError,
 )
 from echonotify.orders.interfaces import IOrderRepository, IUserOrderRepository
 from echonotify.orders.models import Orders, OrderStatus, UsersOrder
@@ -45,35 +43,9 @@ class OrderRepository(IOrderRepository):
     async def change_status(
         self, order_id: int, new_status: OrderStatus
     ) -> OrderResponse:
-        """Change order status with validation"""
-        # Get current order status
-        stmt = select(UsersOrder).where(UsersOrder.order_id == order_id)
-        result = await self.session.execute(stmt)
-        user_order = result.scalar_one_or_none()
-
-        if not user_order:
-            raise OrderWasNotFoundError()
-
-        current_status = OrderStatus(user_order.delivery_status)
-
-        # Validate status transitions
-        valid_transitions = {
-            OrderStatus.PENDING: [OrderStatus.PAID, OrderStatus.CANCELLED],
-            OrderStatus.PAID: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-            OrderStatus.SHIPPED: [OrderStatus.DELIVERED],
-            OrderStatus.DELIVERED: [],
-            OrderStatus.CANCELLED: [],
-        }
-
-        if new_status not in valid_transitions.get(current_status, []):
-            raise UnavailableChangeStatusError(
-                f"Cannot change status from {current_status} to {new_status}"
-            )
-
-        # Update status
+        """Change order status"""
         updated_order = await self.update_status(order_id, new_status)
 
-        # Get order details
         order = await self.get_order_by_id(order_id)
 
         return OrderResponse(
@@ -85,50 +57,26 @@ class OrderRepository(IOrderRepository):
             updated_at=updated_order.created_at,
         )
 
-    async def cancel_order(self, order_id: int) -> bool:
-        """Cancel order (only PENDING or PAID status)"""
+    async def get_user_order_by_order_id(self, order_id: int) -> UsersOrder:
+        """Get user order by order_id"""
         stmt = select(UsersOrder).where(UsersOrder.order_id == order_id)
         result = await self.session.execute(stmt)
         user_order = result.scalar_one_or_none()
-
         if not user_order:
             raise OrderWasNotFoundError()
+        return user_order
 
-        current_status = OrderStatus(user_order.delivery_status)
-
-        # Can only cancel PENDING or PAID orders
-        if current_status not in [OrderStatus.PENDING, OrderStatus.PAID]:
-            raise UnableToCancelTheOrder(
-                f"Cannot cancel order with status {current_status}"
-            )
-
-        # Update status to CANCELLED
+    async def cancel_order(self, order_id: int) -> bool:
+        """Cancel order - set status to CANCELLED"""
         await self.update_status(order_id, OrderStatus.CANCELLED)
         return True
 
     async def complete_delivery(self, order_id: int) -> OrderResponse:
-        """Complete delivery (change status to DELIVERED)"""
-        stmt = select(UsersOrder).where(UsersOrder.order_id == order_id)
-        result = await self.session.execute(stmt)
-        user_order = result.scalar_one_or_none()
-
-        if not user_order:
-            raise OrderWasNotFoundError()
-
-        current_status = OrderStatus(user_order.delivery_status)
-
-        # Can only complete delivery from SHIPPED status
-        if current_status != OrderStatus.SHIPPED:
-            raise UnavailableChangeStatusError(
-                f"Cannot complete delivery from status {current_status}"
-            )
-
-        # Update status to DELIVERED
+        """Complete delivery - set status to DELIVERED"""
         updated_order = await self.update_status(
             order_id, OrderStatus.DELIVERED
         )
 
-        # Get order details
         order = await self.get_order_by_id(order_id)
 
         return OrderResponse(

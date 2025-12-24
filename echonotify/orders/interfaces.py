@@ -22,6 +22,10 @@ class IOrderRepository(Protocol):
         """Delete order by order_id"""
         ...
 
+    async def get_user_order_by_order_id(self, order_id: int) -> UsersOrder:
+        """Get user order by order_id"""
+        ...
+
     async def change_status(
         self, order_id: int, new_status: OrderStatus
     ) -> OrderResponse:
@@ -61,7 +65,7 @@ class IOrderService(Protocol):
     """Interface for business logic(Orders)"""
 
     async def get_user_orders(
-        self, user_id: int, status: OrderStatus
+        self, user_id: int, status: OrderStatus | None = None
     ) -> list[OrderResponse]:
         """Get user's orders"""
         ...

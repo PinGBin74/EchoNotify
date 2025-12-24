@@ -14,6 +14,14 @@ from echonotify.orders.schema import OrderResponse
 
 
 class OrderService(IOrderService):
+    VALID_TRANSITIONS = {
+        OrderStatus.PENDING: [OrderStatus.PAID, OrderStatus.CANCELLED],
+        OrderStatus.PAID: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
+        OrderStatus.SHIPPED: [OrderStatus.DELIVERED],
+        OrderStatus.DELIVERED: [],
+        OrderStatus.CANCELLED: [],
+    }
+
     def __init__(
         self,
         session: AsyncSession,
@@ -34,26 +42,46 @@ class OrderService(IOrderService):
     async def change_status(
         self, order_id: int, new_status: OrderStatus
     ) -> OrderResponse:
-        """Change order's status"""
-        try:
-            order = await self.order_repository.change_status(
-                order_id, new_status
+        """Change order's status with validation"""
+        user_order = await self.order_repository.get_user_order_by_order_id(
+            order_id
+        )
+        current_status = OrderStatus(user_order.delivery_status)
+
+        if new_status not in self.VALID_TRANSITIONS.get(current_status, []):
+            raise UnavailableChangeStatusError(
+                f"Cannot change status from {current_status} to {new_status}"
             )
-            return order
-        except UnavailableChangeStatusError as e:
-            raise e from e
+
+        order = await self.order_repository.change_status(order_id, new_status)
+        return order
 
     async def cancel_order(self, order_id: int) -> bool:
-        try:
-            result = await self.order_repository.cancel_order(order_id)
-            return result
-        except UnableToCancelTheOrder as e:
-            raise e from e
+        """Cancel order (only PENDING or PAID status)"""
+        user_order = await self.order_repository.get_user_order_by_order_id(
+            order_id
+        )
+        current_status = OrderStatus(user_order.delivery_status)
+
+        if current_status not in [OrderStatus.PENDING, OrderStatus.PAID]:
+            raise UnableToCancelTheOrder(
+                f"Cannot cancel order with status {current_status}"
+            )
+
+        result = await self.order_repository.cancel_order(order_id)
+        return result
 
     async def complete_delivery(self, order_id: int) -> OrderResponse:
-        """Finish delivery"""
-        try:
-            order = await self.order_repository.complete_delivery(order_id)
-            return order
-        except UnavailableChangeStatusError as e:
-            raise e from e
+        """Complete delivery (only SHIPPED status)"""
+        user_order = await self.order_repository.get_user_order_by_order_id(
+            order_id
+        )
+        current_status = OrderStatus(user_order.delivery_status)
+
+        if current_status != OrderStatus.SHIPPED:
+            raise UnavailableChangeStatusError(
+                f"Cannot complete delivery from status {current_status}"
+            )
+
+        order = await self.order_repository.complete_delivery(order_id)
+        return order

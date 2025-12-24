@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -12,8 +15,8 @@ class OrderCreate(BaseModel):
 
 
 class OrderUpdate(BaseModel):
-    title: str | None = None
-    price: float | None = None
+    title: Optional[str] = None
+    price: Optional[float] = None
     delivery_status: OrderStatus
 
 
