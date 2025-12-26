@@ -11,3 +11,7 @@ venv/
 .gitignore
 .dockerignore 
 .env
+.venv/
+uv.lock
+poetry.lock
+pyproject.toml
