@@ -51,8 +51,5 @@ jobs:
       - name: Install deps
         run: uv sync --locked --all-extras --dev
 
-      - name: Create .env
-        run: printf '%s\n' "${{ secrets.DOTENV_FILE }}" > .env
-
       - name: Run tests
         run: uv run pytest
