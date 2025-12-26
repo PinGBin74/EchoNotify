@@ -1,5 +1,5 @@
 frontend/node_modules
-infra/frontend/build
+infrascture/frontend/build
 .env
 
 # Byte-compiled / optimized / DLL files
@@ -141,3 +141,7 @@ dmypy.json
 media/
 Makefile
 .ruff_cache
+ideaOfProject.md
+seed_orders.py
+users.pass.txt
+.DS_Store

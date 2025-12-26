@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Support Dashboard - EchoNotify</title>
+        <link rel="stylesheet" href="/frontend/css/support-dashboard.css" />
+    </head>
+    <body>
+        <div class="header">
+            <h1>Support Dashboard</h1>
+            <div class="connection-status">
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span id="statusText">Disconnected</span>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Login Form -->
+                <div id="loginSection">
+                    <div class="login-form">
+                        <h2>Connect as Support</h2>
+                        <div class="input-group">
+                            <label for="tokenInput">Access Token</label>
+                            <input
+                                type="text"
+                                id="tokenInput"
+                                placeholder="Enter your JWT token"
+                            />
+                        </div>
+                        <button class="btn btn-primary" id="connectButton">
+                            Connect
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Rooms List -->
+                <div id="roomsSection" class="hidden">
+                    <div class="sidebar-header">
+                        <h2>Active Chats</h2>
+                        <div class="stats">
+                            <div class="stat-card">
+                                <div class="stat-number" id="activeRoomsCount">
+                                    0
+                                </div>
+                                <div class="stat-label">Active</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="unreadCount">
+                                    0
+                                </div>
+                                <div class="stat-label">Unread</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rooms-list" id="roomsList">
+                        <!-- Rooms will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="chat-area">
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                        />
+                    </svg>
+                    <h3>No Chat Selected</h3>
+                    <p>Select a chat from the sidebar to start responding</p>
+                </div>
+
+                <!-- Chat Container -->
+                <div class="chat-container" id="chatContainer" style="display: none;">
+                    <div class="chat-header">
+                        <div class="chat-info">
+                            <h3 id="chatUserName">User Name</h3>
+                            <div class="chat-meta">
+                                Room ID: <span id="chatRoomId">-</span> |
+                                Started:
+                                <span id="chatStartTime">-</span>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button
+                                class="btn btn-secondary"
+                                id="closeRoomButton"
+                            >
+                                Close Chat
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Chat Section -->
+                    <div id="chatSection">
+                        <div class="messages-container" id="messagesContainer">
+                            <!-- Messages will be inserted here -->
+                        </div>
+                    </div>
+                    <!-- Message Input Container -->
+                    <div class="message-input-container" id="messageInputContainer">
+                        <textarea
+                            class="message-input"
+                            id="messageInput"
+                            placeholder="Type your response..."
+                            rows="1"
+                        ></textarea>
+                        <button class="send-button" id="sendButton" disabled>
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Templates -->
+        <template id="roomTemplate">
+            <div class="room-item">
+                <div class="room-user">
+                    <span class="user-name"></span>
+                    <span class="unread-badge hidden"></span>
+                </div>
+                <div class="room-preview"></div>
+                <div class="room-time"></div>
+            </div>
+        </template>
+
+        <template id="messageTemplate">
+            <div class="message">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-bubble"></div>
+                    <div class="message-meta">
+                        <span class="sender-name"></span>
+                        <span class="timestamp"></span>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="typingIndicatorTemplate">
+            <div class="message" id="typingIndicator">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="notificationTemplate">
+            <div class="notification">
+                <span class="notification-text"></span>
+            </div>
+        </template>
+
+        <script src="/frontend/js/support-dashboard.js"></script>
+    </body>
+</html>

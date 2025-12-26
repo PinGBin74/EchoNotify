@@ -15,6 +15,7 @@ from echonotify.exception import (
     TokenExpiredError,
     TokenNotCorrectError,
     UserNotCorrectPasswordError,
+    UserNotFoundError,
 )
 from echonotify.infrastructure.database.database import get_db_session
 from echonotify.settings import Settings
@@ -57,6 +58,10 @@ async def login(
     except UserNotCorrectPasswordError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
+        ) from e
+    except UserNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
         ) from e
 
 

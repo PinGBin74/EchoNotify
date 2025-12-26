@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Support Chat - EchoNotify</title>
+        <link rel="stylesheet" href="/frontend/css/chat.css" />
+    </head>
+    <body>
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>Support Chat</h2>
+                <div class="connection-status">
+                    <span class="status-indicator" id="statusIndicator"></span>
+                    <span id="statusText">Disconnected</span>
+                </div>
+            </div>
+
+            <!-- Login Section -->
+            <div id="loginSection" class="login-section">
+                <h3>Connect to Chat</h3>
+                <div class="input-group">
+                    <label for="tokenInput">Access Token</label>
+                    <input
+                        type="text"
+                        id="tokenInput"
+                        placeholder="Enter your JWT token"
+                    />
+                </div>
+                <div class="input-group">
+                    <label for="roomInput">Room ID (optional)</label>
+                    <input
+                        type="text"
+                        id="roomInput"
+                        placeholder="Leave empty for private room"
+                    />
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="supportMode" />
+                    <label for="supportMode">Connect as Support Staff</label>
+                </div>
+                <button class="btn btn-primary" id="connectButton">
+                    Connect
+                </button>
+            </div>
+
+            <!-- Chat Section -->
+            <div id="chatSection" class="hidden">
+                <div id="roomInfo" class="room-info hidden"></div>
+                <div class="messages-container" id="messagesContainer">
+                    <!-- Messages will be inserted here -->
+                </div>
+            </div>
+            <!-- Message Input Container - всегда виден когда чат активен -->
+            <div class="message-input-container" id="messageInputContainer" style="display: none;">
+                <textarea
+                    class="message-input"
+                    id="messageInput"
+                    placeholder="Type your message..."
+                    rows="1"
+                ></textarea>
+                <button class="send-button" id="sendButton" disabled>
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Templates -->
+        <template id="messageTemplate">
+            <div class="message">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-bubble"></div>
+                    <div class="message-meta">
+                        <span class="sender-name"></span>
+                        <span class="timestamp"></span>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="typingIndicatorTemplate">
+            <div class="message" id="typingIndicator">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="notificationTemplate">
+            <div class="notification">
+                <span class="notification-text"></span>
+            </div>
+        </template>
+
+        <script src="/frontend/js/chat.js"></script>
+    </body>
+</html>

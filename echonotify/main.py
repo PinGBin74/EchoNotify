@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from echonotify.auth.handlers import router as auth_router
+from echonotify.chat.handlers import router as chat_router
+from echonotify.orders.handlers import router as orders_router
 from echonotify.settings import Settings
 from echonotify.users.user_creation.handlers import router as users_router
 
@@ -27,7 +30,7 @@ app.add_middleware(
         "Set-Cookie",
         "X-Requested-With",
     ],
-    max_age=settings.CORS_MAX_AGE,
+    max_age=settings.CORS_MAX_AGE or 600,
 )
 
 
@@ -44,3 +47,10 @@ async def root():
 app.include_router(auth_router)
 
 app.include_router(users_router)
+
+app.include_router(orders_router)
+
+app.include_router(chat_router)
+
+# Mount static files
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")

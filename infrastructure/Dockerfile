@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
     --trusted-host pypi.tuna.tsinghua.edu.cn
 
 COPY echonotify ./echonotify
+COPY frontend ./frontend
 COPY alembic.ini ./
 COPY alembic ./alembic
 
