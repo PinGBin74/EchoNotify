@@ -26,6 +26,26 @@ body {
     overflow: hidden;
 }
 
+#chatSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.message-input-container {
+    padding: 20px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    min-height: 92px;
+    border-radius: 0 0 15px 15px;
+}
+
+
+
 .chat-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -262,15 +282,6 @@ body {
     30% {
         transform: translateY(-10px);
     }
-}
-
-.message-input-container {
-    padding: 20px;
-    background: white;
-    border-top: 1px solid #e0e0e0;
-    display: flex;
-    gap: 10px;
-    align-items: center;
 }
 
 .message-input {

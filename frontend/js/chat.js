@@ -15,6 +15,7 @@ class ChatApp {
   initElements() {
     this.loginSection = document.getElementById("loginSection");
     this.chatSection = document.getElementById("chatSection");
+    this.messageInputContainer = document.getElementById("messageInputContainer");
     this.tokenInput = document.getElementById("tokenInput");
     this.roomInput = document.getElementById("roomInput");
     this.supportMode = document.getElementById("supportMode");
@@ -70,6 +71,7 @@ class ChatApp {
     this.updateStatus(true);
     this.loginSection.classList.add("hidden");
     this.chatSection.classList.remove("hidden");
+    this.messageInputContainer.style.display = "flex";
     this.sendButton.disabled = false;
     this.showNotification("Connected to chat", "success");
   }
@@ -107,6 +109,7 @@ class ChatApp {
     this.sendButton.disabled = true;
     this.connectButton.disabled = false;
     this.connectButton.textContent = "Connect";
+    this.messageInputContainer.style.display = "none";
     this.showNotification("Disconnected from chat", "error");
   }
 
@@ -133,8 +136,9 @@ class ChatApp {
   }
 
   displayMessage(data, animate = true) {
-    const messageDiv = document.createElement("div");
-    messageDiv.className = "message";
+    // Get template from HTML
+    const template = document.getElementById("messageTemplate");
+    const messageDiv = template.content.cloneNode(true).firstElementChild;
 
     // Determine if message is from current user
     const isOwn = data.sender_id === this.userId;
@@ -146,40 +150,26 @@ class ChatApp {
       messageDiv.classList.add("support");
     }
 
-    const avatar = document.createElement("div");
-    avatar.className = "message-avatar";
+    // Set avatar
+    const avatar = messageDiv.querySelector(".message-avatar");
     avatar.textContent = data.sender_name
       ? data.sender_name.charAt(0).toUpperCase()
       : "U";
 
-    const contentDiv = document.createElement("div");
-    contentDiv.className = "message-content";
-
-    const bubble = document.createElement("div");
-    bubble.className = "message-bubble";
+    // Set message content
+    const bubble = messageDiv.querySelector(".message-bubble");
     bubble.textContent = data.message;
 
-    const meta = document.createElement("div");
-    meta.className = "message-meta";
-
-    const senderName = document.createElement("span");
+    // Set metadata
+    const senderName = messageDiv.querySelector(".sender-name");
     senderName.textContent = data.sender_name || "User";
 
-    const timestamp = document.createElement("span");
+    const timestamp = messageDiv.querySelector(".timestamp");
     const date = new Date(data.created_at || data.timestamp);
     timestamp.textContent = date.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
-
-    meta.appendChild(senderName);
-    meta.appendChild(timestamp);
-
-    contentDiv.appendChild(bubble);
-    contentDiv.appendChild(meta);
-
-    messageDiv.appendChild(avatar);
-    messageDiv.appendChild(contentDiv);
 
     this.messagesContainer.appendChild(messageDiv);
     this.scrollToBottom();
@@ -192,23 +182,13 @@ class ChatApp {
       existing.remove();
     }
 
-    const typingDiv = document.createElement("div");
-    typingDiv.id = "typingIndicator";
-    typingDiv.className = "message";
-    typingDiv.innerHTML = `
-                    <div class="message-avatar">
-                        ${senderName.charAt(0).toUpperCase()}
-                    </div>
-                    <div class="message-content">
-                        <div class="message-bubble">
-                            <div class="typing-indicator">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+    // Get template from HTML
+    const template = document.getElementById("typingIndicatorTemplate");
+    const typingDiv = template.content.cloneNode(true).firstElementChild;
+
+    // Set avatar
+    const avatar = typingDiv.querySelector(".message-avatar");
+    avatar.textContent = senderName.charAt(0).toUpperCase();
 
     this.messagesContainer.appendChild(typingDiv);
     this.scrollToBottom();
@@ -225,6 +205,12 @@ class ChatApp {
   handleTyping() {
     this.autoResizeTextarea();
 
+    // Гарантируем, что контейнер ввода не сжимается
+    const inputContainer = document.querySelector('.message-input-container');
+    if (inputContainer) {
+      inputContainer.style.minHeight = '92px';
+    }
+
     if (!this.isSupport && this.ws && this.ws.readyState === WebSocket.OPEN) {
       clearTimeout(this.typingTimeout);
 
@@ -237,9 +223,10 @@ class ChatApp {
   }
 
   autoResizeTextarea() {
+    // Сохраняем минимальную высоту
     this.messageInput.style.height = "auto";
-    this.messageInput.style.height =
-      Math.min(this.messageInput.scrollHeight, 100) + "px";
+    const newHeight = Math.min(this.messageInput.scrollHeight, 100);
+    this.messageInput.style.height = Math.max(newHeight, 44) + "px"; // Минимальная высота 44px
   }
 
   updateStatus(connected) {
@@ -260,9 +247,14 @@ class ChatApp {
   }
 
   showNotification(message, type = "success") {
-    const notification = document.createElement("div");
+    // Get template from HTML
+    const template = document.getElementById("notificationTemplate");
+    const notification = template.content.cloneNode(true).firstElementChild;
+    
     notification.className = `notification ${type}`;
-    notification.textContent = message;
+    const textElement = notification.querySelector(".notification-text");
+    textElement.textContent = message;
+    
     document.body.appendChild(notification);
 
     setTimeout(() => {

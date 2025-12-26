@@ -79,8 +79,8 @@
                     <p>Select a chat from the sidebar to start responding</p>
                 </div>
 
-                <!-- Chat Section -->
-                <div id="chatSection" class="hidden">
+                <!-- Chat Container -->
+                <div class="chat-container" id="chatContainer" style="display: none;">
                     <div class="chat-header">
                         <div class="chat-info">
                             <h3 id="chatUserName">User Name</h3>
@@ -99,10 +99,14 @@
                             </button>
                         </div>
                     </div>
-                    <div class="messages-container" id="messagesContainer">
-                        <!-- Messages will be inserted here -->
+                    <!-- Chat Section -->
+                    <div id="chatSection">
+                        <div class="messages-container" id="messagesContainer">
+                            <!-- Messages will be inserted here -->
+                        </div>
                     </div>
-                    <div class="message-input-container">
+                    <!-- Message Input Container -->
+                    <div class="message-input-container" id="messageInputContainer">
                         <textarea
                             class="message-input"
                             id="messageInput"
@@ -127,6 +131,52 @@
                 </div>
             </div>
         </div>
+
+        <!-- Templates -->
+        <template id="roomTemplate">
+            <div class="room-item">
+                <div class="room-user">
+                    <span class="user-name"></span>
+                    <span class="unread-badge hidden"></span>
+                </div>
+                <div class="room-preview"></div>
+                <div class="room-time"></div>
+            </div>
+        </template>
+
+        <template id="messageTemplate">
+            <div class="message">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-bubble"></div>
+                    <div class="message-meta">
+                        <span class="sender-name"></span>
+                        <span class="timestamp"></span>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="typingIndicatorTemplate">
+            <div class="message" id="typingIndicator">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="notificationTemplate">
+            <div class="notification">
+                <span class="notification-text"></span>
+            </div>
+        </template>
 
         <script src="/frontend/js/support-dashboard.js"></script>
     </body>

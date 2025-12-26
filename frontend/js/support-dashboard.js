@@ -14,7 +14,9 @@ class SupportDashboard {
         this.loginSection = document.getElementById("loginSection");
         this.roomsSection = document.getElementById("roomsSection");
         this.emptyState = document.getElementById("emptyState");
+        this.chatContainer = document.getElementById("chatContainer");
         this.chatSection = document.getElementById("chatSection");
+        this.messageInputContainer = document.getElementById("messageInputContainer");
         this.tokenInput = document.getElementById("tokenInput");
         this.connectButton =
             document.getElementById("connectButton");
@@ -203,36 +205,43 @@ class SupportDashboard {
     }
 
     createRoomElement(room) {
-        const div = document.createElement("div");
-        div.className = "room-item";
+        // Get template from HTML
+        const template = document.getElementById("roomTemplate");
+        const roomDiv = template.content.cloneNode(true).firstElementChild;
+
         if (room.id === this.currentRoomId) {
-            div.classList.add("active");
+            roomDiv.classList.add("active");
         }
         if (room.unread > 0) {
-            div.classList.add("unread");
+            roomDiv.classList.add("unread");
         }
 
+        // Set user name
         const userName = `User #${room.user_id}`;
-        const time = new Date(
-            room.lastMessageTime,
-        ).toLocaleTimeString([], {
+        const userNameElement = roomDiv.querySelector(".user-name");
+        userNameElement.textContent = userName;
+
+        // Set unread badge
+        const unreadBadge = roomDiv.querySelector(".unread-badge");
+        if (room.unread > 0) {
+            unreadBadge.textContent = room.unread;
+            unreadBadge.classList.remove("hidden");
+        }
+
+        // Set room preview
+        const preview = roomDiv.querySelector(".room-preview");
+        preview.textContent = room.lastMessage || "No messages yet";
+
+        // Set room time
+        const time = new Date(room.lastMessageTime).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
         });
+        const timeElement = roomDiv.querySelector(".room-time");
+        timeElement.textContent = `Room #${room.id} • ${time}`;
 
-        div.innerHTML = `
-                        <div class="room-user">
-                            <span>${userName}</span>
-                            ${room.unread > 0 ? `<span class="unread-badge">${room.unread}</span>` : ""}
-                        </div>
-                        <div class="room-preview">${room.lastMessage || "No messages yet"}</div>
-                        <div class="room-time">Room #${room.id} • ${time}</div>
-                    `;
-
-        div.addEventListener("click", () =>
-            this.selectRoom(room.id),
-        );
-        return div;
+        roomDiv.addEventListener("click", () => this.selectRoom(room.id));
+        return roomDiv;
     }
 
     async selectRoom(roomId) {
@@ -247,7 +256,7 @@ class SupportDashboard {
 
         // Update UI
         this.emptyState.classList.add("hidden");
-        this.chatSection.classList.remove("hidden");
+        this.chatContainer.style.display = "flex";
         this.sendButton.disabled = false;
 
         this.chatUserName.textContent = `User #${room.user_id}`;
@@ -307,48 +316,35 @@ class SupportDashboard {
     }
 
     displayMessage(data, animate = true) {
-        const messageDiv = document.createElement("div");
-        messageDiv.className = "message";
+        // Get template from HTML
+        const template = document.getElementById("messageTemplate");
+        const messageDiv = template.content.cloneNode(true).firstElementChild;
 
         const isOwn = data.sender_role === "support";
         if (isOwn) {
             messageDiv.classList.add("own");
         }
 
-        const avatar = document.createElement("div");
-        avatar.className = "message-avatar";
+        // Set avatar
+        const avatar = messageDiv.querySelector(".message-avatar");
         avatar.textContent = data.sender_name
             ? data.sender_name.charAt(0).toUpperCase()
             : "U";
 
-        const contentDiv = document.createElement("div");
-        contentDiv.className = "message-content";
-
-        const bubble = document.createElement("div");
-        bubble.className = "message-bubble";
+        // Set message content
+        const bubble = messageDiv.querySelector(".message-bubble");
         bubble.textContent = data.message;
 
-        const meta = document.createElement("div");
-        meta.className = "message-meta";
-
-        const senderName = document.createElement("span");
+        // Set metadata
+        const senderName = messageDiv.querySelector(".sender-name");
         senderName.textContent = data.sender_name || "User";
 
-        const timestamp = document.createElement("span");
+        const timestamp = messageDiv.querySelector(".timestamp");
         const date = new Date(data.created_at || data.timestamp);
         timestamp.textContent = date.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
         });
-
-        meta.appendChild(senderName);
-        meta.appendChild(timestamp);
-
-        contentDiv.appendChild(bubble);
-        contentDiv.appendChild(meta);
-
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(contentDiv);
 
         this.messagesContainer.appendChild(messageDiv);
         this.scrollToBottom();
@@ -360,30 +356,19 @@ class SupportDashboard {
             existing.remove();
         }
 
-        const typingDiv = document.createElement("div");
-        typingDiv.id = "typingIndicator";
-        typingDiv.className = "message";
-        typingDiv.innerHTML = `
-                        <div class="message-avatar">
-                            ${senderName.charAt(0).toUpperCase()}
-                        </div>
-                        <div class="message-content">
-                            <div class="message-bubble">
-                                <div class="typing-indicator">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+        // Get template from HTML
+        const template = document.getElementById("typingIndicatorTemplate");
+        const typingDiv = template.content.cloneNode(true).firstElementChild;
+
+        // Set avatar
+        const avatar = typingDiv.querySelector(".message-avatar");
+        avatar.textContent = senderName.charAt(0).toUpperCase();
 
         this.messagesContainer.appendChild(typingDiv);
         this.scrollToBottom();
 
         setTimeout(() => {
-            const indicator =
-                document.getElementById("typingIndicator");
+            const indicator = document.getElementById("typingIndicator");
             if (indicator) {
                 indicator.remove();
             }
@@ -420,7 +405,7 @@ class SupportDashboard {
                 this.rooms.delete(this.currentRoomId);
                 this.currentRoomId = null;
                 this.emptyState.classList.remove("hidden");
-                this.chatSection.classList.add("hidden");
+                this.chatContainer.style.display = "none";
                 this.refreshRoomsList();
             }
         } catch (error) {
@@ -455,9 +440,14 @@ class SupportDashboard {
     }
 
     showNotification(message, type = "success") {
-        const notification = document.createElement("div");
+        // Get template from HTML
+        const template = document.getElementById("notificationTemplate");
+        const notification = template.content.cloneNode(true).firstElementChild;
+        
         notification.className = `notification ${type}`;
-        notification.textContent = message;
+        const textElement = notification.querySelector(".notification-text");
+        textElement.textContent = message;
+        
         document.body.appendChild(notification);
 
         setTimeout(() => {
