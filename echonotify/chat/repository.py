@@ -103,14 +103,15 @@ class RoomRepository:
     ) -> Optional[ChatRoom]:
         """Get active room for user from database"""
         stmt = select(ChatRoom).where(
-            ChatRoom.user_id == user_id, ChatRoom.is_active == True
+            ChatRoom.user_id == user_id,
+            ChatRoom.is_active == True,  # noqa
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
     async def get_all_active_rooms(self) -> list[ChatRoom]:
         """Get all active rooms from database"""
-        stmt = select(ChatRoom).where(ChatRoom.is_active == True)
+        stmt = select(ChatRoom).where(ChatRoom.is_active == True)  # noqa
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
@@ -137,7 +138,8 @@ class RoomRepository:
     async def get_rooms_by_support_id(self, support_id: int) -> list[ChatRoom]:
         """Get all rooms assigned to support from database"""
         stmt = select(ChatRoom).where(
-            ChatRoom.support_id == support_id, ChatRoom.is_active == True
+            ChatRoom.support_id == support_id,
+            ChatRoom.is_active == True,  # noqa
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
