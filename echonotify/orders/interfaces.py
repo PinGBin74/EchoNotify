@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Protocol
 
 from echonotify.orders.models import Orders, OrderStatus, UsersOrder
@@ -82,18 +81,4 @@ class IOrderService(Protocol):
 
     async def complete_delivery(self, order_id: int) -> OrderResponse:
         """Finish delivery"""
-        ...
-
-
-class IOrderStatistics(Protocol):
-    """Statistics about orders"""
-
-    async def get_user_stats(self, user_id: int) -> dict:
-        """User's statistics about orders: quantity, amount, average check bill"""
-        ...
-
-    async def get_total_revenue(
-        self, status: OrderStatus, date_from: datetime, date_to: datetime
-    ) -> float:
-        """Get total revenue"""
         ...

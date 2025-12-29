@@ -12,6 +12,8 @@ from echonotify.users.user_creation.handlers import router as users_router
 
 settings = Settings()
 
+# Redis and Celery are initialized separately in their respective modules
+
 
 app = FastAPI(
     title="Echonotify API",
@@ -21,7 +23,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"],
     allow_headers=[
@@ -51,6 +53,7 @@ app.include_router(users_router)
 app.include_router(orders_router)
 
 app.include_router(chat_router)
+
 
 # Mount static files
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")

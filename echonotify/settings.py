@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     DB_DRIVER: str = ""
     DB_NAME: str = ""
     DATABASE_URL: str = ""
-    CORS_ORIGINS: str = ""
+    CORS_ORIGINS_STR: str = ""
     CORS_MAX_AGE: Optional[int] = None
 
     # JWT settings
@@ -23,6 +23,15 @@ class Settings(BaseSettings):
 
     # PyOTP settings
     PYOTP_SECRET_KEY: str = ""
+
+    # Redis settings
+    REDIS_HOST: str = ""
+    REDIS_PORT: int = 0
+    REDIS_DB: int = 0
+
+    # Celery settings
+    CELERY_BROKER_URL: str = ""
+    CELERY_RESULT_BACKEND: str = ""
 
     class Config:
         env_file = ".env"
@@ -33,7 +42,7 @@ class Settings(BaseSettings):
         """
         Parse CORS_ORIGINS env var into a list of strings.
         """
-        v = (self.CORS_ORIGINS or "").strip()
+        v = (self.CORS_ORIGINS_STR or "").strip()
         if not v:
             return []
         if v.startswith("["):
