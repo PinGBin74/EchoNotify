@@ -8,6 +8,8 @@ from redis.asyncio import ConnectionPool, Redis
 
 from echonotify.infrastructure.redis.constants import (
     DEFAULT_TTL,
+    REDIS_LOCK_TTL,
+    REDIS_SESSION_TTL,
     SCAN_KEYS_COUNT,
 )
 from echonotify.settings import Settings
@@ -296,29 +298,6 @@ class RedisLock(BaseRedisClient):
         ttl: Optional[int] = None,
     ) -> bool:
         """Extend distributed lock TTL."""
-        client = await self.connect()
-        lock_key = f"lock:{resource}"
-        expire_time = ttl or self.lock_ttl
-
-        lua_script = """
-        if redis.call("get", KEYS[1]) == ARGV[1] then
-            return redis.call("expire", KEYS[1], ARGV[2])
-        else
-            return 0
-        end
-        """
-
-        result = await client.eval(
-            lua_script, 1, lock_key, identifier, expire_time
-        )
-        return result == 1
-
-    async def extend_lock(
-        self,
-        resource: str,
-        identifier: str,
-        ttl: Optional[int] = None,
-    ) -> bool:
         client = await self.connect()
         lock_key = f"lock:{resource}"
         expire_time = ttl or self.lock_ttl

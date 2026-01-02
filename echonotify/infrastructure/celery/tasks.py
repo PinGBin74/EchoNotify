@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from celery import shared_task
 
+from echonotify.auth.utils import utc_now_naive
 from echonotify.infrastructure.database.database import get_db_session
 from echonotify.infrastructure.redis.client import (
     get_redis_cache,
@@ -85,7 +86,7 @@ async def cleanup_old_messages_task():
 
             from echonotify.chat.models import Message
 
-            cutoff_date = datetime.utcnow() - timedelta(days=7)
+            cutoff_date = utc_now_naive() - timedelta(days=7)
 
             stmt = delete(Message).where(Message.created_at < cutoff_date)
 
