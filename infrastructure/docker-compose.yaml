@@ -1,5 +1,3 @@
-
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -116,41 +114,6 @@ services:
       /usr/local/bin/wait-for-it.sh postgres:5432 --timeout=30 -- echo 'Postgres is ready' &&
       /usr/local/bin/wait-for-it.sh redis:6379 --timeout=30 -- echo 'Redis is ready' &&
       celery -A echonotify.celery_app beat --loglevel=info
-      "
-
-  flower:
-    platform: linux/amd64
-    build:
-      context: ..
-      dockerfile: infrastructure/Dockerfile
-    ports:
-      - "5555:5555"
-    env_file:
-      - .env
-    environment:
-      - ENVIRONMENT=docker
-      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
-      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      celery_worker:
-        condition: service_started
-      echonotify:
-        condition: service_started
-    networks:
-      - internal
-    restart: always
-    command: >
-      sh -c "
-      /usr/local/bin/wait-for-it.sh postgres:5432 --timeout=30 -- echo 'Postgres is ready' &&
-      /usr/local/bin/wait-for-it.sh redis:6379 --timeout=30 -- echo 'Redis is ready' &&
-      /usr/local/bin/wait-for-it.sh celery_worker: --timeout=30 -- echo 'Celery worker is ready' &&
-      celery -A echonotify.celery_app flower --port=5555 --url_prefix=flower
       "
 
 volumes:
